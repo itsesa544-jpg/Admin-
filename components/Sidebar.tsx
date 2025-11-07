@@ -1,12 +1,11 @@
 import React from 'react';
-import { HomeIcon, SettingsIcon, UsersIcon, BellIcon, TrophyIcon, CalendarIcon, BookOpenIcon, ImageIcon, PhoneIcon, LogoutIcon, CloseIcon } from './icons/Icons';
+import { HomeIcon, SettingsIcon, UsersIcon, BellIcon, TrophyIcon, CalendarIcon, BookOpenIcon, ImageIcon, PhoneIcon, CloseIcon } from './icons/Icons';
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   activePage: string;
   onNavigate: (pageId: string) => void;
-  onLogout: () => void;
 }
 
 interface NavItem {
@@ -27,7 +26,7 @@ const navItems: NavItem[] = [
   { id: 'contact', name: 'যোগাযোগ', icon: PhoneIcon },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activePage, onNavigate, onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activePage, onNavigate }) => {
   return (
     <>
       {/* Overlay */}
@@ -53,31 +52,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, activePage, onNaviga
           </button>
         </div>
 
-        <nav className="flex-1 mt-4">
-          <ul>
+        <nav className="flex-1 mt-4 px-2 space-y-1">
             {navItems.map((item) => (
-              <li key={item.id} className="px-4">
-                <button
-                  onClick={() => onNavigate(item.id)}
-                  className={`flex items-center w-full p-2 my-1 rounded-md transition-colors duration-200 text-left ${
-                    item.id === activePage
-                      ? 'bg-green-600 text-white'
-                      : 'text-gray-300 hover:bg-slate-700 hover:text-white'
-                  }`}
-                >
-                  <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
-                  <span>{item.name}</span>
-                </button>
-              </li>
+              <button
+                key={item.id}
+                onClick={() => onNavigate(item.id)}
+                className={`flex items-center w-full p-2 rounded-md transition-colors duration-200 text-left ${
+                  item.id === activePage
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-300 hover:bg-slate-700 hover:text-white'
+                }`}
+              >
+                <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+                <span>{item.name}</span>
+              </button>
             ))}
-          </ul>
         </nav>
 
-        <div className="p-4 border-t border-slate-700">
-          <button onClick={onLogout} className="flex items-center w-full p-2 rounded-md text-gray-300 hover:bg-slate-700 hover:text-white transition-colors duration-200">
-            <LogoutIcon className="w-5 h-5 mr-3 transform rotate-180" />
-            <span>লগ আউট</span>
-          </button>
+        <div className="p-4 mt-auto border-t border-slate-700">
+           <p className="text-xs text-slate-400 text-center">ডেমো সংস্করণ</p>
         </div>
       </aside>
     </>
