@@ -10,8 +10,9 @@ import {
   GalleryManagementPage,
   ContactManagementPage 
 } from './components/Dashboard';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut, User } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 // --- Mock Data ---
@@ -74,6 +75,7 @@ const App: React.FC = () => {
 
   // State for all managed data
   const [siteInfo, setSiteInfo] = useState(initialSiteInfo);
+  const [teachers, setTeachers] = useState<any[]>([]);
   const [notices, setNotices] = useState(initialNotices);
   const [results, setResults] = useState(initialResults);
   const [routines, setRoutines] = useState(initialRoutines);
@@ -90,6 +92,25 @@ const App: React.FC = () => {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+  const fetchTeachers = useCallback(async () => {
+    if (!user) return;
+    try {
+        const teachersCollectionRef = collection(db, "teachers");
+        const data = await getDocs(teachersCollectionRef);
+        setTeachers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    } catch (error) {
+        console.error("Error fetching teachers:", error);
+    }
+  }, [user]);
+
+  useEffect(() => {
+      if (user) {
+          fetchTeachers();
+      } else {
+          setTeachers([]); // Clear on logout
+      }
+  }, [user, fetchTeachers]);
 
 
   const toggleSidebar = useCallback(() => {
@@ -124,7 +145,7 @@ const App: React.FC = () => {
       case 'site-info':
         return <SiteInfoPage data={siteInfo} setData={setSiteInfo} />;
       case 'teachers':
-        return <TeacherManagementPage />;
+        return <TeacherManagementPage teachers={teachers} onDataChange={fetchTeachers} />;
       case 'notices':
         return <ContentManagerPage title="নোটিশ ব্যবস্থাপনা" data={notices} setData={setNotices} />;
        case 'results':

@@ -140,24 +140,11 @@ export const SiteInfoPage: React.FC<{ data: any, setData: (data: any) => void }>
 };
 
 // 2. Teacher Management Page
-export const TeacherManagementPage: React.FC = () => {
-    const [teachers, setTeachers] = useState<any[]>([]);
+export const TeacherManagementPage: React.FC<{ teachers: any[], onDataChange: () => Promise<void> }> = ({ teachers, onDataChange }) => {
     const [isModalOpen, setModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any | null>(null);
-    const [loading, setLoading] = useState(true);
 
     const teachersCollectionRef = collection(db, "teachers");
-
-    const fetchTeachers = async () => {
-        setLoading(true);
-        const data = await getDocs(teachersCollectionRef);
-        setTeachers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchTeachers();
-    }, []);
 
     const handleAdd = () => {
         setEditingItem(null);
@@ -174,7 +161,7 @@ export const TeacherManagementPage: React.FC = () => {
             try {
                 const teacherDoc = doc(db, "teachers", id);
                 await deleteDoc(teacherDoc);
-                setTeachers(teachers.filter(item => item.id !== id));
+                await onDataChange();
                  alert('শিক্ষকের তথ্য সফলভাবে মুছে ফেলা হয়েছে!');
             } catch (error) {
                 console.error("Error deleting document: ", error);
@@ -207,7 +194,7 @@ export const TeacherManagementPage: React.FC = () => {
                 alert('নতুন শিক্ষক সফলভাবে যোগ করা হয়েছে!');
             }
             
-            fetchTeachers(); // Refresh the list from Firebase
+            await onDataChange(); // Refresh the list from parent
             setModalOpen(false);
             setEditingItem(null);
         } catch (error) {
@@ -215,10 +202,6 @@ export const TeacherManagementPage: React.FC = () => {
              alert('ত্রুটি! তথ্য সংরক্ষণ করা সম্ভব হয়নি।');
         }
     };
-
-    if (loading) {
-        return <div className="text-center p-10">লোড হচ্ছে...</div>;
-    }
 
     return (
         <div>
@@ -237,7 +220,7 @@ export const TeacherManagementPage: React.FC = () => {
                     <tbody>
                         {teachers.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="text-center p-6 text-gray-500">কোনো শিক্ষকের তথ্য পাওয়া যায়নি।</td>
+                                <td colSpan={5} className="text-center p-6 text-gray-500">শিক্ষকদের তথ্য লোড হচ্ছে অথবা কোনো তথ্য পাওয়া যায়নি।</td>
                             </tr>
                         ) : (
                             teachers.map(teacher => (
