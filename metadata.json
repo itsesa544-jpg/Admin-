@@ -1,0 +1,5 @@
+{
+  "name": "Admin Panel",
+  "description": "A responsive admin panel dashboard with a sidebar navigation and content cards, designed for managing a website's content and settings.",
+  "requestFramePermissions": []
+}
